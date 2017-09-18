@@ -7,8 +7,9 @@
 \alias{fastrtext-package}
 \title{fastrtext: 'fastText' Wrapper for Text Classification and Word Representation}
 \description{
-'fastText' is an open-source, free, lightweight library that allows
-users to learn text representations and text classifiers.
+Learning text representations and text classifiers may rely
+on the same simple and efficient approach. 'fastText' is an open-source, free,
+lightweight library that allows users to perform both tasks.
 It transforms text into continuous vectors that can later
 be used on many language related task.
 It works on standard, generic hardware (no 'GPU' required).
@@ -20,12 +21,13 @@ at <https://github.com/facebookresearch/fastText>.
 Useful links:
 \itemize{
   \item \url{https://github.com/pommedeterresautee/fastrtext}
+  \item \url{https://pommedeterresautee.github.io/fastrtext/}
   \item Report bugs at \url{https://github.com/pommedeterresautee/fastrtext/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Michaël Benesty \email{michael@benesty.fr}
+\strong{Maintainer}: Michaël Benesty \email{michael@benesty.fr} [copyright holder]
 
 Other contributors:
 \itemize{
