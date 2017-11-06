@@ -4,6 +4,7 @@ data("train_sentences")
 data("test_sentences")
 
 test_labels <- paste0("__label__", test_sentences[, "class.text"])
+test_labels_without_prefix <- test_sentences[, "class.text"]
 test_texts <- tolower(test_sentences[, "text"])
 test_sentences_with_labels <- paste(test_labels, test_texts)
 
@@ -48,6 +49,14 @@ test_that("Training of a classification model", {
   expect_gt(mean(names(unlist(learned_model_predictions)) ==
                    names(unlist(embedded_model_predictions))), 0.75)
 
+  # check with simplify = TRUE
+  embedded_model_predictions_bis <- predict(embedded_model,
+                                        sentences = test_sentences_with_labels,
+                                        simplify = TRUE)
+  expect_true(is.numeric(embedded_model_predictions_bis))
+  expect_gt(mean(names(unlist(learned_model_predictions)) ==
+                   names(embedded_model_predictions_bis)), 0.75)
+
   # Compare with quantize model
   execute(commands = c("quantize",
                        "-output", tmp_file_model,
@@ -70,8 +79,10 @@ test_that("Test predictions", {
   predictions <- predict(model, sentences = test_sentences_with_labels)
 
   # test measure (for 1 class, hamming == accuracy)
-  expect_equal(get_hamming_loss(as.list(test_labels), predictions),
-               mean(sapply(predictions, names) == test_labels))
+  expect_equal(get_hamming_loss(as.list(test_labels_without_prefix), predictions),
+               mean(sapply(predictions, names) == test_labels_without_prefix))
+
+  expect_gt(get_hamming_loss(as.list(test_labels_without_prefix), predictions), 0.5)
 
   predictions <- predict(model, sentences = test_sentences_with_labels)
   expect_length(predictions, 600)
@@ -79,7 +90,7 @@ test_that("Test predictions", {
   expect_equal(unique(lengths(predict(model,
                                       sentences = test_sentences_with_labels,
                                       k = 2))), 2)
-  expect_equal(object = mean(sapply(predictions, names) == test_labels),
+  expect_equal(object = mean(sapply(predictions, names) == test_labels_without_prefix),
                expected = 0.8, tolerance = 0.1)
 })
 
