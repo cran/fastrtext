@@ -12,7 +12,7 @@
 
 <meta name="author" content="M. Benesty" />
 
-<meta name="date" content="2017-11-06" />
+<meta name="date" content="2017-11-09" />
 
 <title>Supervised learning</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Supervised learning</h1>
 <h4 class="author"><em>M. Benesty</em></h4>
-<h4 class="date"><em>2017-11-06</em></h4>
+<h4 class="date"><em>2017-11-09</em></h4>
 
 
 
@@ -100,7 +100,7 @@ Read 0M words
 ## Number of words:  5060
 ## Number of labels: 15
 ## 
-Progress: 100.0%  words/sec/thread: 2413998  lr: 0.000000  loss: 0.302441  eta: 0h0m</code></pre>
+Progress: 100.0%  words/sec/thread: 2364298  lr: 0.000000  loss: 0.306825  eta: 0h0m</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load model</span>
 model &lt;-<span class="st"> </span><span class="kw">load_model</span>(tmp_file_model)</code></pre></div>
 <pre><code>## add .bin extension to the path</code></pre>
@@ -113,7 +113,7 @@ predictions &lt;-<span class="st"> </span><span class="kw">predict</span>(model,
 ## 
 ## [[2]]
 ##      MISC 
-## 0.9863281 
+## 0.9921875 
 ## 
 ## [[3]]
 ##      MISC 
@@ -121,11 +121,11 @@ predictions &lt;-<span class="st"> </span><span class="kw">predict</span>(model,
 ## 
 ## [[4]]
 ##      OWNX 
-## 0.9101562 
+## 0.9238281 
 ## 
 ## [[5]]
-##      AIMX 
-## 0.9882813</code></pre>
+##     AIMX 
+## 0.984375</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Compute accuracy</span>
 <span class="kw">mean</span>(<span class="kw">names</span>(<span class="kw">unlist</span>(predictions)) <span class="op">==</span><span class="st"> </span>test_labels_without_prefix)</code></pre></div>
 <pre><code>## [1] 0.8366667</code></pre>
@@ -141,7 +141,7 @@ predictions &lt;-<span class="st"> </span><span class="kw">predict</span>(model,
 ## 
 ## [[2]]
 ##      MISC 
-## 0.9863281 
+## 0.9921875 
 ## 
 ## [[3]]
 ##      MISC 
@@ -149,23 +149,23 @@ predictions &lt;-<span class="st"> </span><span class="kw">predict</span>(model,
 ## 
 ## [[4]]
 ##      OWNX 
-## 0.9101562 
+## 0.9238281 
 ## 
 ## [[5]]
-##      AIMX 
-## 0.9882813</code></pre>
+##     AIMX 
+## 0.984375</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># you can get flat list of results when you are retrieving only one label per observation</span>
 <span class="kw">print</span>(<span class="kw">head</span>(<span class="kw">predict</span>(model, <span class="dt">sentences =</span> test_to_write, <span class="dt">simplify =</span> <span class="ot">TRUE</span>)))</code></pre></div>
-<pre><code>##      OWNX      MISC      MISC      OWNX      AIMX MISC--the 
-## 0.9980469 0.9863281 0.9921875 0.9101562 0.9882813 0.4003907</code></pre>
+<pre><code>##      OWNX      MISC      MISC      OWNX      AIMX      CONT 
+## 0.9980469 0.9921875 0.9921875 0.9238281 0.9843750 0.3945313</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># free memory</span>
 <span class="kw">unlink</span>(train_tmp_file_txt)
 <span class="kw">unlink</span>(tmp_file_model)
 <span class="kw">rm</span>(model)
 <span class="kw">gc</span>()</code></pre></div>
 <pre><code>##           used (Mb) gc trigger (Mb) max used (Mb)
-## Ncells  551323 29.5     940480 50.3   750400 40.1
-## Vcells 1138205  8.7    1943012 14.9  1551572 11.9</code></pre>
+## Ncells  551382 29.5     940480 50.3   750400 40.1
+## Vcells 1138243  8.7    1943012 14.9  1543057 11.8</code></pre>
 
 
 
