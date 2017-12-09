@@ -1,3 +1,11 @@
+# 0.2.4
+
+  * major refactoring
+  * update to last version of fastText sourcecode
+  * sentence representation function
+  * add tags function
+  * fix compilation on Windows R Dev
+
 # 0.2.3 (9.11.17)
 
   * fix a cran note related to the DESCRIPTION file
