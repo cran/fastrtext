@@ -1,3 +1,11 @@
+# 0.2.5
+
+  * add get word id function
+  * add tokenizer function
+  * change the way sentence vector are computed (use fastText internal code to improve speed)
+  * remove RcppThread due to change in FB source code (no more print from any threadr)
+  * add possibility to interrupte learning
+
 # 0.2.4
 
   * major refactoring
@@ -5,6 +13,7 @@
   * sentence representation function
   * add tags function
   * fix compilation on Windows R Dev
+  * better Makevars (related to strippedLib task)
 
 # 0.2.3 (9.11.17)
 

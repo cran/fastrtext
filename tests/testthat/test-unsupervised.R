@@ -18,6 +18,7 @@ test_that("Training", {
                        "-thread", 1,
                        "-dim", 50,
                        "-bucket", 1e3,
+                       "-loss", "ns",
                        "-epoch", 20))
 
   # Check learned file exists
@@ -27,6 +28,27 @@ test_that("Training", {
   model <- load_model(tmp_file_model)
   parameters <- get_parameters(model)
   expect_equal(parameters$model_name, "sg")
+
+  execute(commands = c("skipgram",
+                       "-input", tmp_file_txt,
+                       "-output", tmp_file_model,
+                       "-verbose", 0,
+                       "-thread", 1,
+                       "-dim", 50,
+                       "-bucket", 1e3,
+                       "-loss", "softmax",
+                       "-epoch", 3))
+
+  execute(commands = c("cbow",
+                       "-input", tmp_file_txt,
+                       "-output", tmp_file_model,
+                       "-verbose", 0,
+                       "-thread", 1,
+                       "-dim", 50,
+                       "-bucket", 1e3,
+                       "-loss", "hs",
+                       "-epoch", 3))
+
 })
 
 test_that("Test parameter extraction", {
@@ -36,7 +58,7 @@ test_that("Test parameter extraction", {
   expect_equal(parameters$model_name, "sg")
 })
 
-test_that("Test word extraction", {
+test_that("Test word extraction and word IDs", {
   model <- load_model(model_test_path)
   dict <- get_dictionary(model)
   expect_length(dict, 2061)
@@ -44,6 +66,16 @@ test_that("Test word extraction", {
   expect_true("timing" %in% dict)
   expect_true("experience" %in% dict)
   expect_true("section" %in% dict)
+
+  sentence_to_test <- c("this", "is", "a", "test")
+  ids <- get_word_ids(model, sentence_to_test)
+  expect_equal(get_dictionary(model)[ids], sentence_to_test)
+})
+
+test_that("Tokenization separate words in a text document", {
+  model <- load_model(model_test_path)
+  tokens <- get_tokenized_text(model, "this is a test")
+  expect_equal(tokens, list(c("this", "is", "a", "test")))
 })
 
 test_that("Test word embeddings", {

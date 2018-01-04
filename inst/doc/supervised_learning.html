@@ -12,7 +12,7 @@
 
 <meta name="author" content="M. Benesty" />
 
-<meta name="date" content="2017-12-10" />
+<meta name="date" content="2018-01-04" />
 
 <title>Supervised learning</title>
 
@@ -70,7 +70,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Supervised learning</h1>
 <h4 class="author"><em>M. Benesty</em></h4>
-<h4 class="date"><em>2017-12-10</em></h4>
+<h4 class="date"><em>2018-01-04</em></h4>
 
 
 
@@ -100,7 +100,7 @@ Read 0M words
 ## Number of words:  5060
 ## Number of labels: 15
 ## 
-Progress: 100.0%  words/sec/thread: 2330046  lr: 0.000000  loss: 0.377418  eta: 0h0m</code></pre>
+Progress: 100.0% words/sec/thread: 1527406 lr:  0.000000 loss:  0.305070 ETA:   0h 0m</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load model</span>
 model &lt;-<span class="st"> </span><span class="kw">load_model</span>(tmp_file_model)</code></pre></div>
 <pre><code>## add .bin extension to the path</code></pre>
@@ -109,63 +109,63 @@ predictions &lt;-<span class="st"> </span><span class="kw">predict</span>(model,
 <span class="kw">print</span>(<span class="kw">head</span>(predictions, <span class="dv">5</span>))</code></pre></div>
 <pre><code>## [[1]]
 ##      OWNX 
-## 0.9996878 
+## 0.9996521 
 ## 
 ## [[2]]
 ##      MISC 
-## 0.9927685 
+## 0.9899388 
 ## 
 ## [[3]]
 ##      MISC 
-## 0.9826711 
+## 0.9953604 
 ## 
 ## [[4]]
-##     OWNX 
-## 0.883123 
+##      OWNX 
+## 0.8782121 
 ## 
 ## [[5]]
 ##      AIMX 
-## 0.9886047</code></pre>
+## 0.9875715</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Compute accuracy</span>
 <span class="kw">mean</span>(<span class="kw">names</span>(<span class="kw">unlist</span>(predictions)) <span class="op">==</span><span class="st"> </span>test_labels_without_prefix)</code></pre></div>
-<pre><code>## [1] 0.825</code></pre>
+<pre><code>## [1] 0.8233333</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># because there is only one category by observation, hamming loss will be the same</span>
 <span class="kw">get_hamming_loss</span>(<span class="kw">as.list</span>(test_labels_without_prefix), predictions)</code></pre></div>
-<pre><code>## [1] 0.825</code></pre>
+<pre><code>## [1] 0.8233333</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># test predictions</span>
 predictions &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">sentences =</span> test_to_write)
 <span class="kw">print</span>(<span class="kw">head</span>(predictions, <span class="dv">5</span>))</code></pre></div>
 <pre><code>## [[1]]
 ##      OWNX 
-## 0.9996878 
+## 0.9996521 
 ## 
 ## [[2]]
 ##      MISC 
-## 0.9927685 
+## 0.9899388 
 ## 
 ## [[3]]
 ##      MISC 
-## 0.9826711 
+## 0.9953604 
 ## 
 ## [[4]]
-##     OWNX 
-## 0.883123 
+##      OWNX 
+## 0.8782121 
 ## 
 ## [[5]]
 ##      AIMX 
-## 0.9886047</code></pre>
+## 0.9875715</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># you can get flat list of results when you are retrieving only one label per observation</span>
 <span class="kw">print</span>(<span class="kw">head</span>(<span class="kw">predict</span>(model, <span class="dt">sentences =</span> test_to_write, <span class="dt">simplify =</span> <span class="ot">TRUE</span>)))</code></pre></div>
-<pre><code>##      OWNX      MISC      MISC      OWNX      AIMX MISC--the 
-## 0.9996878 0.9927685 0.9826711 0.8831230 0.9886047 0.3094368</code></pre>
+<pre><code>##      OWNX      MISC      MISC      OWNX      AIMX      CONT 
+## 0.9996521 0.9899388 0.9953604 0.8782121 0.9875715 0.4825342</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># free memory</span>
 <span class="kw">unlink</span>(train_tmp_file_txt)
 <span class="kw">unlink</span>(tmp_file_model)
 <span class="kw">rm</span>(model)
 <span class="kw">gc</span>()</code></pre></div>
 <pre><code>##           used (Mb) gc trigger (Mb) max used (Mb)
-## Ncells  552147 29.5     940480 50.3   750400 40.1
-## Vcells 1139882  8.7    1943014 14.9  1535844 11.8</code></pre>
+## Ncells  553859 29.6     940480 50.3   940480 50.3
+## Vcells 1142900  8.8    1943194 14.9  1548727 11.9</code></pre>
 
 
 

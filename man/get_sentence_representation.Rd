@@ -7,12 +7,12 @@
 get_sentence_representation(model, sentences)
 }
 \arguments{
-\item{model}{fastText model}
+\item{model}{\code{fastText} model}
 
 \item{sentences}{\link{character} containing the sentences}
 }
 \description{
-Sentence is splitted in words (using space separation), and word embeddings are averaged.
+Sentence is splitted in words (using space characters), and word embeddings are averaged.
 }
 \examples{
 library(fastrtext)
