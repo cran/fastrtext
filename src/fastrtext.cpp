@@ -63,12 +63,12 @@ public:
     List list(documents.size());
     int label_prefix_size = model->getArgs().label.size();
     std::string s;
-    for(int i = 0; i < documents.size(); ++i){
+    for (int i = 0; i < documents.size(); ++i){
       s = documents[i];
-      std::vector<std::pair<real, std::string> > predictions = predict_proba(s, k);
+      auto predictions = predict_proba(s, k);
       NumericVector logProbabilities(predictions.size());
       CharacterVector labels(predictions.size());
-      for (int j = 0; j < predictions.size() ; ++j){
+      for (size_t j = 0; j < predictions.size() ; ++j){
         logProbabilities[j] = predictions[j].first;
         // remove label prefix
         std::string label_without_prefix = predictions[j].second.erase(0, label_prefix_size);
@@ -77,7 +77,7 @@ public:
       NumericVector probabilities(exp(logProbabilities));
       probabilities.attr("names") = labels;
       list[i] = probabilities;
-      Rcpp::checkUserInterrupt();
+      if (i % 5 == 0) Rcpp::checkUserInterrupt();
     }
     return list;
   }
@@ -232,13 +232,24 @@ public:
     return wrap(text_split);
   }
 
-  NumericVector get_sentence_vector(const std::string sentence) {
+  NumericVector get_sentence_embeddings(const CharacterVector& sentences) {
     check_model_loaded();
-    fasttext::Vector v(model->getDimension());
-    std::stringstream ioss;
-    copy(sentence.begin(), sentence.end(), std::ostream_iterator<char>(ioss));
-    model->getSentenceVector(ioss, v);
-    return wrap(std::vector<real>(v.data(), v.data() + v.size()));
+    int dimensions = model->getDimension();
+    NumericMatrix sentence_embeddings(sentences.size(), dimensions);
+
+    fasttext::Vector v(dimensions);
+    NumericVector vector_r;
+    std::string sentence;
+    for (int i = 0; i < sentences.size(); i++) {
+      std::stringstream ioss;
+      sentence = as<std::string>(sentences[i]);
+      copy(sentence.begin(), sentence.end(), std::ostream_iterator<char>(ioss));
+      model->getSentenceVector(ioss, v);
+      vector_r = wrap(std::vector<real>(v.data(), v.data() + v.size()));
+      sentence_embeddings(i, _) = vector_r;
+    }
+
+    return sentence_embeddings;
   }
 
 private:
@@ -354,6 +365,6 @@ RCPP_MODULE(FASTRTEXT_MODULE) {
   .method("get_labels", &fastrtext::get_labels, "List all labels")
   .method("get_nn_by_vector", &fastrtext::get_nn_by_vector, "Get nearest neighbour words, providing a vector")
   .method("tokenize", &fastrtext::tokenize, "Tokenize a text in words")
-  .method("get_sentence_vector", &fastrtext::get_sentence_vector, "Get the dense representation of a sentence")
+  .method("get_sentence_embeddings", &fastrtext::get_sentence_embeddings, "Get the dense representation of sentences")
   .method("print_help", &fastrtext::print_help, "Print command helps");
 }

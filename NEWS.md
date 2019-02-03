@@ -1,12 +1,16 @@
-# 0.2.5
+# 0.2.6 (31.1.19)
+
+  * use -pthread flag for better Cran compliancy
+
+# 0.2.5 (4.1.18)
 
   * add get word id function
   * add tokenizer function
   * change the way sentence vector are computed (use fastText internal code to improve speed)
-  * remove RcppThread due to change in FB source code (no more print from any threadr)
+  * remove RcppThread due to change in FB source code (no more print from multiple at the same time thread)
   * add possibility to interrupte learning
 
-# 0.2.4
+# 0.2.4 (9.12.17)
 
   * major refactoring
   * update to last version of fastText sourcecode
