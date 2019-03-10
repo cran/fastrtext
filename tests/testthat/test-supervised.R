@@ -28,12 +28,11 @@ test_that("Training of a classification model", {
             c("supervised",
               "-input", train_tmp_file_txt,
               "-output", tmp_file_model,
-              "-dim", 20,
+              "-dim", 10,
               "-lr", 1,
-              "-epoch", 20,
+              "-epoch", 5,
               "-bucket", 1e4,
-              "-verbose", 0,
-              "-thread", 1))
+              "-verbose", 0))
 
   # Check learned file exists
   expect_true(file.exists(paste0(tmp_file_model, ".bin")))
@@ -49,13 +48,31 @@ test_that("Training of a classification model", {
   expect_gt(mean(names(unlist(learned_model_predictions)) ==
                    names(unlist(embedded_model_predictions))), 0.75)
 
+  build_supervised(documents = train_texts,
+                   targets  = train_sentences[, "class.text"],
+                   model_path = tmp_file_model,
+                   dim = 10,
+                   lr = 1,
+                   epoch = 5,
+                   bucket = 1e4,
+                   verbose = 0)
+
+  expect_true(file.exists(paste0(tmp_file_model, ".bin")))
+
+  learned_model <- load_model(tmp_file_model)
+  learned_model_predictions_bis <- predict(learned_model,
+                                           sentences = test_sentences_with_labels)
+
+  expect_gt(object = mean(names(unlist(learned_model_predictions)) == names(unlist(learned_model_predictions_bis))),
+            expected = 0.6)
+
   # check with simplify = TRUE
   embedded_model_predictions_bis <- predict(embedded_model,
                                         sentences = test_sentences_with_labels,
                                         simplify = TRUE)
   expect_true(is.numeric(embedded_model_predictions_bis))
   expect_gt(mean(names(unlist(learned_model_predictions)) ==
-                   names(embedded_model_predictions_bis)), 0.75)
+                   names(embedded_model_predictions_bis)), 0.7)
 
   # Compare with quantize model
   execute(commands = c("quantize",
@@ -70,8 +87,8 @@ test_that("Training of a classification model", {
   quantized_model <- load_model(paste0(tmp_file_model, ".ftz"))
   quantized_model_predictions <- predict(quantized_model,
                                          sentences = test_sentences_with_labels)
-  expect_gt(mean(names(unlist(learned_model_predictions)) ==
-                   names(unlist(quantized_model_predictions))), 0.9)
+  expect_gt(mean(names(unlist(embedded_model_predictions_bis)) ==
+                   names(unlist(quantized_model_predictions))), 0.75)
 })
 
 test_that("Test predictions", {

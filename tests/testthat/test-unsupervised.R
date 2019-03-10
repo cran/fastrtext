@@ -15,11 +15,10 @@ test_that("Training", {
                        "-input", tmp_file_txt,
                        "-output", tmp_file_model,
                        "-verbose", 0,
-                       "-thread", 1,
-                       "-dim", 50,
+                       "-dim", 10,
                        "-bucket", 1e3,
                        "-loss", "ns",
-                       "-epoch", 20))
+                       "-epoch", 3))
 
   # Check learned file exists
   expect_true(file.exists(paste0(tmp_file_model, ".bin")))
@@ -29,25 +28,14 @@ test_that("Training", {
   parameters <- get_parameters(model)
   expect_equal(parameters$model_name, "sg")
 
-  execute(commands = c("skipgram",
-                       "-input", tmp_file_txt,
-                       "-output", tmp_file_model,
-                       "-verbose", 0,
-                       "-thread", 1,
-                       "-dim", 50,
-                       "-bucket", 1e3,
-                       "-loss", "softmax",
-                       "-epoch", 3))
-
-  execute(commands = c("cbow",
-                       "-input", tmp_file_txt,
-                       "-output", tmp_file_model,
-                       "-verbose", 0,
-                       "-thread", 1,
-                       "-dim", 50,
-                       "-bucket", 1e3,
-                       "-loss", "hs",
-                       "-epoch", 3))
+  build_vectors(documents = texts,
+                model_path = tmp_file_model,
+                modeltype = "skipgram",
+                bucket = 1e3,
+                dim = 10,
+                epoch = 3,
+                loss = "softmax",
+                verbose = 0)
 
 })
 
@@ -96,12 +84,6 @@ test_that("Nearest neighbours", {
   model <- load_model(model_test_path)
   nn <- get_nn(model, "time", 10)
   expect_true("times" %in% names(nn))
-})
-
-test_that("Test analogies", {
-  model <- load_model(model_test_path)
-  analogies <- get_analogies(model, "experience", "experiences", "result")
-  expect_equal(names(analogies), "results")
 })
 
 test_that("Test sentence representation", {

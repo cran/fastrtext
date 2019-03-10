@@ -1,3 +1,11 @@
+# 0.3.1 (07.03.19)
+
+  * update the C++ source code to the current fassttext version
+  * remove analogies function
+  * update error message
+  * add function to add prefix to words (to create different spaces in the same dataset, useful for classification in particular)
+  * simplify tests
+
 # 0.2.6 (31.1.19)
 
   * use -pthread flag for better Cran compliancy

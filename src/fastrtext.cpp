@@ -58,23 +58,23 @@ public:
     std::Rcout << "" << std::endl;
   }
 
-  List predict(CharacterVector documents, int k = 1) {
+  List predict(CharacterVector documents, int k = 1, real threshold = 0) {
     check_model_loaded();
     List list(documents.size());
     int label_prefix_size = model->getArgs().label.size();
     std::string s;
     for (int i = 0; i < documents.size(); ++i){
       s = documents[i];
-      auto predictions = predict_proba(s, k);
-      NumericVector logProbabilities(predictions.size());
+      auto predictions = predict_proba(s, k, threshold);
+      NumericVector probabilitiesFasttext(predictions.size());
       CharacterVector labels(predictions.size());
       for (size_t j = 0; j < predictions.size() ; ++j){
-        logProbabilities[j] = predictions[j].first;
+        probabilitiesFasttext[j] = predictions[j].first;
         // remove label prefix
         std::string label_without_prefix = predictions[j].second.erase(0, label_prefix_size);
         labels[j] = label_without_prefix;
       }
-      NumericVector probabilities(exp(logProbabilities));
+      NumericVector probabilities(probabilitiesFasttext);
       probabilities.attr("names") = labels;
       list[i] = probabilities;
       if (i % 5 == 0) Rcpp::checkUserInterrupt();
@@ -188,28 +188,29 @@ public:
     model->test(ifs, k);
   }
 
-  std::vector<std::pair<real,std::string> > predict_proba(
-      const std::string& text, int32_t k) {
+  std::vector<std::pair<real,std::string> > predict_proba(const std::string& text, int32_t k, real threshold) {
     std::vector<std::pair<real,std::string> > predictions;
     std::istringstream in(text);
-    model->predict(in, k, predictions);
+    model->predictLine(in, predictions, k, threshold);
     return predictions;
   }
 
-  NumericVector get_nn_by_vector(const NumericVector& r_vector, const CharacterVector& banned_words, int32_t k) {
-    std::vector<real> vector = Rcpp::as<std::vector<real> >(r_vector);
-    fasttext::Vector queryVec(vector.size());
-    std::copy(vector.begin(), vector.end(), queryVec.data());
-    std::set<std::string> banSet;
-    banSet.clear();
-    std::string s;
-    for(int i = 0; i < banned_words.size(); ++i) {
-      s = banned_words[i];
-      banSet.insert(s);
+  NumericVector get_nn_by_word(const std::string& queryWord, int32_t k) {
+    std::vector<std::pair<real, std::string>> results = model->getNN(queryWord, k);
+
+    NumericVector distances(k);
+    CharacterVector word_string(k);
+    int32_t i = 0;
+
+    for (int i = 0; i < results.size(); ++i) {
+      distances[i] = results[i].first;
+      word_string[i] = results[i].second;
       Rcpp::checkUserInterrupt();
     }
 
-    return find_nn_vector(queryVec, banSet, k);
+    distances.attr("names") = word_string;
+
+    return distances;
   }
 
   void print_help(){
@@ -296,58 +297,6 @@ private:
     }
   }
 
-  void init_word_matrix(std::shared_ptr<fasttext::Matrix> wordVectors) {
-    fasttext::Vector vec(model->getDimension());
-    wordVectors->zero();
-    std::string s;
-    for (int32_t i = 0; i < model->getDictionary()->nwords(); i++) {
-      s = model->getDictionary()->getWord(i);
-      model->getWordVector(vec, s);
-      real norm = vec.norm();
-      wordVectors->addRow(vec, i, 1.0 / norm);
-      Rcpp::checkUserInterrupt();
-    }
-  }
-
-  NumericVector find_nn_vector(const fasttext::Vector& queryVec, const std::set<std::string>& banSet, int32_t k) {
-
-    if(wordVectors == nullptr){
-      wordVectors = std::make_shared<fasttext::Matrix>(fasttext::Matrix(model->getDictionary()->nwords(), model->getDimension()));
-      init_word_matrix(wordVectors);
-    }
-
-    real queryNorm = queryVec.norm();
-    if (std::abs(queryNorm) < 1e-8) {
-      queryNorm = 1;
-    }
-
-    std::priority_queue<std::pair<real, std::string>> heap;
-    fasttext::Vector vec(model->getDimension());
-    std::string s;
-    for (int32_t i = 0; i < model->getDictionary()->nwords(); i++) {
-      s = model->getDictionary()->getWord(i);
-      real dp = wordVectors->dotRow(queryVec, i);
-      heap.push(std::make_pair(dp / queryNorm, s));
-      Rcpp::checkUserInterrupt();
-    }
-    NumericVector distances(k);
-    CharacterVector word_string(k);
-    int32_t i = 0;
-    while (i < k && heap.size() > 0) {
-      auto it = banSet.find(heap.top().second);
-      if (it == banSet.end()) {
-        distances[i] = heap.top().first;
-        word_string[i] = heap.top().second;
-        i++;
-        Rcpp::checkUserInterrupt();
-      }
-      heap.pop();
-    }
-
-    distances.attr("names") = word_string;
-    return distances;
-  }
-
   std::shared_ptr<fasttext::Matrix> wordVectors;
 };
 
@@ -363,7 +312,7 @@ RCPP_MODULE(FASTRTEXT_MODULE) {
   .method("get_parameters", &fastrtext::get_parameters, "Get parameters used to train the model")
   .method("get_dictionary", &fastrtext::get_dictionary, "List all words learned")
   .method("get_labels", &fastrtext::get_labels, "List all labels")
-  .method("get_nn_by_vector", &fastrtext::get_nn_by_vector, "Get nearest neighbour words, providing a vector")
+  .method("get_nn_by_word", &fastrtext::get_nn_by_word, "Get nearest neighbour words, providing a word")
   .method("tokenize", &fastrtext::tokenize, "Tokenize a text in words")
   .method("get_sentence_embeddings", &fastrtext::get_sentence_embeddings, "Get the dense representation of sentences")
   .method("print_help", &fastrtext::print_help, "Print command helps");
