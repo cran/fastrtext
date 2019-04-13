@@ -2,8 +2,8 @@ Package: fastrtext
 Type: Package
 Title: 'fastText' Wrapper for Text Classification and Word
         Representation
-Version: 0.3.1
-Date: 2019-03-07
+Version: 0.3.2
+Date: 2019-04-14
 Authors@R: c(person("Michaël", "Benesty", role = c("aut", "cre", "cph"), email = "michael@benesty.fr"),
   person("Facebook, Inc", role = c("cph"), email = "bojanowski@fb.com"))
 Maintainer: Michaël Benesty <michael@benesty.fr>
@@ -29,8 +29,8 @@ VignetteBuilder: knitr
 RoxygenNote: 6.1.1
 Encoding: UTF-8
 NeedsCompilation: yes
-Packaged: 2019-03-10 14:20:20 UTC; geantvert
+Packaged: 2019-04-13 22:33:26 UTC; geantvert
 Author: Michaël Benesty [aut, cre, cph],
   Facebook, Inc [cph]
 Repository: CRAN
-Date/Publication: 2019-03-10 14:52:40 UTC
+Date/Publication: 2019-04-13 23:02:54 UTC
